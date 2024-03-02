@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QVBoxLayout,\
     QLineEdit, QComboBox, QPushButton
 from PyQt6.QtGui import QAction
+from PyQt6.QtCore import Qt
 import sys
 import sqlite3
 
@@ -9,7 +10,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.resize(500, 300)
+        self.resize(450, 600)
         self.setWindowTitle("StudentManagementSystem")
 
         # create Menu Bar
@@ -99,6 +100,7 @@ class InsertDialog(QDialog):
         connection.close()
         sms.load_data()
 
+
 class SearchDialog(QDialog):
     def __init__(self):
         super().__init__()
@@ -116,8 +118,23 @@ class SearchDialog(QDialog):
         layout.addWidget(searchbutton)
 
         self.setLayout(layout)
+
     def filter_data(self):
-        pass
+        search_name = self.searchbar.text()
+        self.searchbar.setText("")
+        connection = sqlite3.connect("database.db")
+        cursor = connection.cursor()
+        results = list(cursor.execute("select * from students where name = ?",(search_name,)))
+
+        items = sms.table.findItems(search_name, Qt.MatchFlag.MatchFixedString)
+        for item in items:
+            sms.table.item(item.row(), 1).setSelected(True)
+        cursor.close()
+        connection.close()
+
+
+
+
 
 app = QApplication(sys.argv)
 sms = MainWindow()
