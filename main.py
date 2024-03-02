@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QDialog, QVBoxLayout,\
-    QLineEdit, QComboBox, QPushButton
-from PyQt6.QtGui import QAction
+    QLineEdit, QComboBox, QPushButton, QToolBar
+from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import Qt
 import sys
 import sqlite3
@@ -18,16 +18,24 @@ class MainWindow(QMainWindow):
         help_menu = self.menuBar().addMenu("&Help")
         search_menu = self.menuBar().addMenu("&Edit")
 
-        add_student = QAction('Add Student', self)
+        add_student = QAction(QIcon("icons/add.png"), 'Add Student', self)
         add_student.triggered.connect(self.adding_student)
         file_menu.addAction(add_student)
 
         about = QAction('About', self)
         help_menu.addAction(about)
 
-        filter = QAction('search', self)
+        filter = QAction(QIcon("icons/search.png"),'search', self)
         filter.triggered.connect(self.search_record)
         search_menu.addAction(filter)
+
+        # Create toolbar and toolbar elements
+        toolbar = QToolBar()
+        toolbar.setMovable(True)
+        self.addToolBar(toolbar)
+
+        toolbar.addAction(add_student)
+        toolbar.addAction(filter)
 
         # Creating a table structure
         self.table = QTableWidget()
