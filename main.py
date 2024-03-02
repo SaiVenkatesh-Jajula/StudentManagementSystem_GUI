@@ -6,6 +6,7 @@ import sys
 import sqlite3
 
 
+
 class MainWindow(QMainWindow):
 
     def __init__(self):
@@ -23,7 +24,9 @@ class MainWindow(QMainWindow):
         file_menu.addAction(add_student)
 
         about = QAction('About', self)
+        about.triggered.connect(self.aboutdialog)
         help_menu.addAction(about)
+
 
         filter = QAction(QIcon("icons/search.png"),'search', self)
         filter.triggered.connect(self.search_record)
@@ -95,6 +98,21 @@ class MainWindow(QMainWindow):
     def search_record(self):
         dialog = SearchDialog()
         dialog.exec()
+
+    def aboutdialog(self):
+        dialog = AboutDialog()
+        dialog.exec()
+
+class AboutDialog(QMessageBox):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('About Student Management System')
+        content = """
+    This is Student Mangement System. You can utilize for your own purpose.
+    If you need to update this application. You are welcome. This is hosted in GitHub.    
+        """
+        self.setText(content)
+        self.exec()
 
 class InsertDialog(QDialog):
     def __init__(self):
