@@ -5,7 +5,14 @@ from PyQt6.QtCore import Qt
 import sys
 import sqlite3
 
+class DatabaseConnection:
 
+    def __init__(self,database='database.db'):
+        self.db = database
+
+    def connect(self):
+        connection = sqlite3.connect(self.db)
+        return connection
 
 class MainWindow(QMainWindow):
 
@@ -147,7 +154,7 @@ class InsertDialog(QDialog):
         course = self.coursecombo.currentText()
         mobile = self.mobile.text()
 
-        connection = sqlite3.connect("database.db")
+        connection = DatabaseConnection().connect()
         cursor = connection.cursor()
         cursor.execute("Insert into students(name,course,mobile) values (?,?,?)", (name, course, mobile))
         connection.commit()
@@ -156,6 +163,7 @@ class InsertDialog(QDialog):
         cursor.close()
         connection.close()
         sms.load_data()
+        self.close()
 
 
 class SearchDialog(QDialog):
@@ -179,15 +187,15 @@ class SearchDialog(QDialog):
     def filter_data(self):
         search_name = self.searchbar.text()
         self.searchbar.setText("")
-        connection = sqlite3.connect("database.db")
+        connection = DatabaseConnection().connect()
         cursor = connection.cursor()
         results = list(cursor.execute("select * from students where name = ?",(search_name,)))
-
+        cursor.close()
+        connection.close()
         items = sms.table.findItems(search_name, Qt.MatchFlag.MatchFixedString)
         for item in items:
             sms.table.item(item.row(), 1).setSelected(True)
-        cursor.close()
-        connection.close()
+        self.close()
 
 class UpdateDialog(QDialog):
     def __init__(self):
@@ -226,7 +234,7 @@ class UpdateDialog(QDialog):
         self.setLayout(layout)
 
     def update_student(self):
-        connection = sqlite3.connect('database.db')
+        connection = DatabaseConnection().connect()
         cursor = connection.cursor()
         cursor.execute("update students set name=?, course=?, mobile=? where id=?",
                        (self.sname.text(),self.coursecombo.currentText(),self.mobile.text(),self.sid))
@@ -234,6 +242,7 @@ class UpdateDialog(QDialog):
         cursor.close()
         connection.close()
         sms.load_data()
+        self.close()
 
 
 class DeleteDialog(QDialog):
@@ -260,7 +269,7 @@ class DeleteDialog(QDialog):
 
         self.setLayout(grid)
     def delete_student(self):
-        connection = sqlite3.connect('database.db')
+        connection = DatabaseConnection().connect()
         cursor = connection.cursor()
         cursor.execute('delete from students where id = ?',(self.sid,))
         connection.commit()
